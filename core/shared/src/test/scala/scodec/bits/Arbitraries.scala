@@ -44,7 +44,7 @@ object Arbitraries {
     n <- Gen.choose(0L, maxSize)
     b <- genBitVector(15, 7)
   } yield {
-    val m = if (b.nonEmpty) (n % b.size).abs else 0
+    val m = if (b.nonEmpty) (n % b.size.value).abs else 0
     b.take(m) ++ b.drop(m)
   }
 

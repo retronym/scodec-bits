@@ -45,7 +45,7 @@ object StreamingBitVectorTest extends App {
           i += 1
         }
       }
-      countBits(t, acc + (if (touchBytes) i.toLong else h.size / 8), touchBytes)
+      countBits(t, acc + (if (touchBytes) i else (h.size / 8).value), touchBytes)
     }
   }
   import java.io._

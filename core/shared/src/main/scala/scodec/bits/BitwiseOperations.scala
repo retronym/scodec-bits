@@ -4,7 +4,6 @@ package scodec.bits
  * Bitwise operations on a value of type `Repr`.
  *
  * @tparam Repr type that supports that supports bitwise operations
- * @tparam Idx numeric index type
  *
  * @groupname bitwise Bitwise Operations
  * @groupprio bitwise 2
@@ -12,35 +11,35 @@ package scodec.bits
  * @define bitwiseOperationsReprDescription value
  * @define minsize The resulting $bitwiseOperationsReprDescription's size is the minimum of this $bitwiseOperationsReprDescription's size and the specified $bitwiseOperationsReprDescription's size.
  */
-trait BitwiseOperations[Repr <: BitwiseOperations[Repr, Idx], Idx] {
+trait BitwiseOperations[Repr <: BitwiseOperations[Repr]] {
 
   /**
    * Returns a $bitwiseOperationsReprDescription of the same size with each bit shifted to the left `n` bits.
    *
    * @group bitwise
    */
-  final def <<(n: Idx): Repr = shiftLeft(n)
+  final def <<(n: Bits): Repr = shiftLeft(n)
 
   /**
    * Returns a $bitwiseOperationsReprDescription of the same size with each bit shifted to the left `n` bits.
    *
    * @group bitwise
    */
-  def shiftLeft(n: Idx): Repr
+  def shiftLeft(n: Bits): Repr
 
   /**
    * Returns a $bitwiseOperationsReprDescription of the same size with each bit shifted to the right `n` bits where the `n` left-most bits are sign extended.
    *
    * @group bitwise
    */
-  final def >>(n: Idx): Repr = shiftRight(n, true)
+  final def >>(n: Bits): Repr = shiftRight(n, true)
 
   /**
    * Returns a $bitwiseOperationsReprDescription of the same size with each bit shifted to the right `n` bits where the `n` left-most bits are low.
    *
    * @group bitwise
    */
-  final def >>>(n: Idx): Repr = shiftRight(n, false)
+  final def >>>(n: Bits): Repr = shiftRight(n, false)
 
   /**
    * Returns a $bitwiseOperationsReprDescription of the same size with each bit shifted to the right `n` bits.
@@ -49,21 +48,21 @@ trait BitwiseOperations[Repr <: BitwiseOperations[Repr, Idx], Idx] {
    *
    * @group bitwise
    */
-  def shiftRight(n: Idx, signExtension: Boolean): Repr
+  def shiftRight(n: Bits, signExtension: Boolean): Repr
 
   /**
    * Returns a $bitwiseOperationsReprDescription of the same size with each bit circularly shifted to the left `n` bits.
    *
    * @group bitwise
    */
-  def rotateLeft(n: Idx): Repr
+  def rotateLeft(n: Bits): Repr
 
   /**
    * Returns a $bitwiseOperationsReprDescription of the same size with each bit circularly shifted to the right `n` bits.
    *
    * @group bitwise
    */
-  def rotateRight(n: Idx): Repr
+  def rotateRight(n: Bits): Repr
 
   /**
    * Returns a bitwise complement of this $bitwiseOperationsReprDescription.

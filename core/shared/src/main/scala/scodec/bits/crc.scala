@@ -19,7 +19,7 @@ object crc {
     require(initial.size == poly.size && poly.size == finalXor.size, "poly, initial, and finalXor must be same length")
 
     var table = Array.ofDim[BitVector](256)
-    val zeroed = BitVector.fill(poly.size - 8)(false)
+    val zeroed = BitVector.fill(poly.size - 8.bits)(false)
     val m = 8L
     @annotation.tailrec
     def calculateTableIndex(idx: Int): Unit = {
@@ -28,7 +28,7 @@ object crc {
         def shift(k: Int, crcreg: BitVector): BitVector = {
           if (k < m) {
             shift(k + 1, {
-              val shifted = crcreg << 1
+              val shifted = crcreg << 1.bits
               if (crcreg.head) shifted xor poly else shifted
             })
           } else crcreg
@@ -46,25 +46,25 @@ object crc {
     def calculate(remaining: BitVector, crcreg: BitVector): BitVector = {
       if (remaining.isEmpty) {
         output(crcreg)
-      } else if (remaining sizeLessThan 8) {
+      } else if (remaining sizeLessThan 8.bits) {
         output(goBitwise(poly, if (reflectInput) remaining.reverseBitOrder else remaining, crcreg))
       } else {
-        val shifted = crcreg << m
-        val inputByte = remaining.take(m)
-        val index = crcreg.take(m) xor (if (reflectInput) inputByte.reverse else inputByte)
+        val shifted = crcreg << m.bits
+        val inputByte = remaining.take(m.bits)
+        val index = crcreg.take(m.bits) xor (if (reflectInput) inputByte.reverse else inputByte)
         val indexAsInt = index.bytes.head.toInt & 0x0ff
-        calculate(remaining drop m, shifted xor table(indexAsInt))
+        calculate(remaining drop m.bits, shifted xor table(indexAsInt))
       }
     }
 
-    if (poly.size < 8) a => output(goBitwise(poly, if (reflectInput) a.reverseBitOrder else a, initial))
+    if (poly.size < 8.bits) a => output(goBitwise(poly, if (reflectInput) a.reverseBitOrder else a, initial))
     else a => calculate(a, initial)
   }
 
   private def goBitwise(poly: BitVector, remaining: BitVector, crcreg: BitVector): BitVector =
     if (remaining.isEmpty) crcreg
     else goBitwise(poly, remaining.tail, {
-      val shifted = crcreg << 1
+      val shifted = crcreg << 1.bits
       if (crcreg.head == remaining.head) shifted else shifted xor poly
     })
 

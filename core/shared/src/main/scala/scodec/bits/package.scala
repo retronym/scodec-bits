@@ -37,4 +37,17 @@ package object bits {
      */
     def hex(args: ByteVector*): ByteVector = macro LiteralSyntaxMacros.hexStringInterpolator
   }
+
+  final implicit class LongSyntax(val value: Long) extends AnyVal {
+    def bit: Bits = Bits(value)
+    def bits: Bits = Bits(value)
+    def byte: Bytes = Bytes(value)
+    def bytes: Bytes = Bytes(value)
+  }
+  final implicit class IntSyntax(val value: Int) extends AnyVal {
+    def bit: Bits = Bits(value.toLong)
+    def bits: Bits = Bits(value.toLong)
+    def byte: Bytes = Bytes(value.toLong)
+    def bytes: Bytes = Bytes(value.toLong)
+  }
 }

@@ -43,7 +43,7 @@ import collection.immutable.Queue
  * @define bitwiseOperationsReprDescription bit vector
  * @define returnsView This method returns a view and hence, is O(1). Call [[compact]] generate a new strict vector.
  */
-sealed abstract class ByteVector extends BitwiseOperations[ByteVector, Long] with Serializable {
+sealed abstract class ByteVector extends BitwiseOperations[ByteVector] with Serializable {
 
   /**
    * Returns the number of bytes in this vector.
@@ -496,16 +496,16 @@ sealed abstract class ByteVector extends BitwiseOperations[ByteVector, Long] wit
   final def reverse: ByteVector =
     ByteVector.view(i => apply(size - i - 1), size)
 
-  final def shiftLeft(n: Long): ByteVector =
+  final def shiftLeft(n: Bits): ByteVector =
     BitVector(this).shiftLeft(n).toByteVector
 
-  final def shiftRight(n: Long, signExtension: Boolean): ByteVector =
+  final def shiftRight(n: Bits, signExtension: Boolean): ByteVector =
     BitVector(this).shiftRight(n, signExtension).toByteVector
 
-  final def rotateLeft(n: Long): ByteVector =
+  final def rotateLeft(n: Bits): ByteVector =
     BitVector(this).rotateLeft(n).toByteVector
 
-  final def rotateRight(n: Long): ByteVector =
+  final def rotateRight(n: Bits): ByteVector =
     BitVector(this).rotateRight(n).toByteVector
 
   /**
@@ -1377,7 +1377,7 @@ object ByteVector {
    * @group numeric
    */
   def fromByte(b: Byte): ByteVector =
-    BitVector.fromByte(b, 8).bytes
+    BitVector.fromByte(b, 8.bits).bytes
 
   /**
    * Constructs a bit vector with the 2's complement encoding of the specified value.
@@ -1386,8 +1386,8 @@ object ByteVector {
    * @param ordering byte ordering of vector
    * @group numeric
    */
-  def fromShort(s: Short, size: Int = 2, ordering: ByteOrdering = ByteOrdering.BigEndian): ByteVector =
-    BitVector.fromShort(s, size * 8, ordering).bytes
+  def fromShort(s: Short, size: Bytes = Bytes(2), ordering: ByteOrdering = ByteOrdering.BigEndian): ByteVector =
+    BitVector.fromShort(s, size.toBits, ordering).bytes
 
   /**
    * Constructs a bit vector with the 2's complement encoding of the specified value.
@@ -1396,8 +1396,8 @@ object ByteVector {
    * @param ordering byte ordering of vector
    * @group numeric
    */
-  def fromInt(i: Int, size: Int = 4, ordering: ByteOrdering = ByteOrdering.BigEndian): ByteVector =
-    BitVector.fromInt(i, size * 8, ordering).bytes
+  def fromInt(i: Int, size: Bytes = Bytes(4), ordering: ByteOrdering = ByteOrdering.BigEndian): ByteVector =
+    BitVector.fromInt(i, size.toBits, ordering).bytes
 
   /**
    * Constructs a bit vector with the 2's complement encoding of the specified value.
@@ -1406,8 +1406,8 @@ object ByteVector {
    * @param ordering byte ordering of vector
    * @group numeric
    */
-  def fromLong(l: Long, size: Int = 8, ordering: ByteOrdering = ByteOrdering.BigEndian): ByteVector =
-    BitVector.fromLong(l, size * 8, ordering).bytes
+  def fromLong(l: Long, size: Bytes = Bytes(8), ordering: ByteOrdering = ByteOrdering.BigEndian): ByteVector =
+    BitVector.fromLong(l, size.toBits, ordering).bytes
 
   /**
    * Constructs a `ByteVector` from a hexadecimal string or returns an error message if the string is not valid hexadecimal.
@@ -1450,7 +1450,7 @@ object ByteVector {
         (if (midByte) {
           bldr.put(hi.toByte)
           bldr.flip()
-          ByteVector(bldr).shiftRight(4, false)
+          ByteVector(bldr).shiftRight(4.bits, false)
         } else {
           bldr.flip()
           ByteVector(bldr)
@@ -1516,7 +1516,7 @@ object ByteVector {
       Right((if (bits > 0) {
         bldr.put((byte << (8 - bits)).toByte)
         bldr.flip()
-        ByteVector(bldr).shiftRight((8 - bits).toLong, false)
+        ByteVector(bldr).shiftRight(8.bits - bits.bits, false)
       } else {
         bldr.flip()
         ByteVector(bldr)
