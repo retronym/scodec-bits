@@ -18,28 +18,28 @@ trait BitwiseOperations[Repr <: BitwiseOperations[Repr]] {
    *
    * @group bitwise
    */
-  final def <<(n: Bits): Repr = shiftLeft(n)
+  final def <<(n: BitCount): Repr = shiftLeft(n)
 
   /**
    * Returns a $bitwiseOperationsReprDescription of the same size with each bit shifted to the left `n` bits.
    *
    * @group bitwise
    */
-  def shiftLeft(n: Bits): Repr
+  def shiftLeft(n: BitCount): Repr
 
   /**
    * Returns a $bitwiseOperationsReprDescription of the same size with each bit shifted to the right `n` bits where the `n` left-most bits are sign extended.
    *
    * @group bitwise
    */
-  final def >>(n: Bits): Repr = shiftRight(n, true)
+  final def >>(n: BitCount): Repr = shiftRight(n, true)
 
   /**
    * Returns a $bitwiseOperationsReprDescription of the same size with each bit shifted to the right `n` bits where the `n` left-most bits are low.
    *
    * @group bitwise
    */
-  final def >>>(n: Bits): Repr = shiftRight(n, false)
+  final def >>>(n: BitCount): Repr = shiftRight(n, false)
 
   /**
    * Returns a $bitwiseOperationsReprDescription of the same size with each bit shifted to the right `n` bits.
@@ -48,21 +48,21 @@ trait BitwiseOperations[Repr <: BitwiseOperations[Repr]] {
    *
    * @group bitwise
    */
-  def shiftRight(n: Bits, signExtension: Boolean): Repr
+  def shiftRight(n: BitCount, signExtension: Boolean): Repr
 
   /**
    * Returns a $bitwiseOperationsReprDescription of the same size with each bit circularly shifted to the left `n` bits.
    *
    * @group bitwise
    */
-  def rotateLeft(n: Bits): Repr
+  def rotateLeft(n: BitCount): Repr
 
   /**
    * Returns a $bitwiseOperationsReprDescription of the same size with each bit circularly shifted to the right `n` bits.
    *
    * @group bitwise
    */
-  def rotateRight(n: Bits): Repr
+  def rotateRight(n: BitCount): Repr
 
   /**
    * Returns a bitwise complement of this $bitwiseOperationsReprDescription.

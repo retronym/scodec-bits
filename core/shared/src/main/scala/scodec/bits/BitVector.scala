@@ -36,20 +36,20 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    *
    * @group collection
    */
-  def size: Bits
+  def size: BitCount
 
   /**
    * Alias for [[size]].
    * @group collection
    */
-  final def length: Bits = size
+  final def length: BitCount = size
 
   /**
    * Returns true if this vector has no bits.
    *
    * @group collection
    */
-  final def isEmpty: Boolean = sizeLessThan(Bits(1))
+  final def isEmpty: Boolean = sizeLessThan(BitCount(1))
 
   /**
    * Returns true if this vector has a non-zero number of bits.
@@ -64,7 +64,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    *
    * @group collection
    */
-  final def sizeGreaterThan(n: Bits): Boolean = n.value < 0 || !sizeLessThanOrEqual(n)
+  final def sizeGreaterThan(n: BitCount): Boolean = n.value < 0 || !sizeLessThanOrEqual(n)
 
   /**
    * Returns `true` if the size of this `BitVector` is greater than or equal to `n`. Unlike `size`, this
@@ -72,7 +72,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    *
    * @group collection
    */
-  final def sizeGreaterThanOrEqual(n: Bits): Boolean = n.value < 0 || !sizeLessThanOrEqual(Bits(n.value - 1))
+  final def sizeGreaterThanOrEqual(n: BitCount): Boolean = n.value < 0 || !sizeLessThanOrEqual(BitCount(n.value - 1))
 
   /**
    * Returns `true` if the size of this `BitVector` is less than `n`. Unlike `size`, this
@@ -80,7 +80,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    *
    * @group collection
    */
-  def sizeLessThan(n: Bits): Boolean
+  def sizeLessThan(n: BitCount): Boolean
 
   /**
    * Returns `true` if the size of this `BitVector` is less than or equal to `n`. Unlike `size`, this
@@ -88,7 +88,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    *
    * @group collection
    */
-  final def sizeLessThanOrEqual(n: Bits): Boolean =
+  final def sizeLessThanOrEqual(n: BitCount): Boolean =
     n.value == Long.MaxValue || sizeLessThan(n + 1.bit)
 
   /**
@@ -106,7 +106,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    *
    * @group collection
    */
-  def get(n: Bits): Boolean
+  def get(n: BitCount): Boolean
 
   /**
    * Returns the `n`th byte, 0-indexed.
@@ -123,14 +123,14 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    * @group collection
    * @see get(Long)
    */
-  final def apply(n: Bits): Boolean = get(n)
+  final def apply(n: BitCount): Boolean = get(n)
 
   /**
    * Returns `Some(true)` if the `n`th bit is high, `Some(false)` if low, and `None` if `n >= size`.
    *
    * @group collection
    */
-  final def lift(n: Bits): Option[Boolean] =
+  final def lift(n: BitCount): Option[Boolean] =
     if (sizeGreaterThan(n)) Some(get(n))
     else None
 
@@ -141,27 +141,27 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    *
    * @group collection
    */
-  def update(n: Bits, high: Boolean): BitVector
+  def update(n: BitCount, high: Boolean): BitVector
 
   /**
    * Returns a vector with the specified bit inserted at the specified index.
    * @group collection
    */
-  final def insert(idx: Bits, b: Boolean): BitVector =
+  final def insert(idx: BitCount, b: Boolean): BitVector =
     (take(idx) :+ b) ++ drop(idx)
 
   /**
    * Returns a vector with the specified bit vector inserted at the specified index.
    * @group collection
    */
-  final def splice(idx: Bits, b: BitVector): BitVector =
+  final def splice(idx: BitCount, b: BitVector): BitVector =
     take(idx) ++ b ++ drop(idx)
 
   /**
    * Returns a vector with the specified bit vector replacing bits `[idx, idx + b.size]`.
    * @group collection
    */
-  final def patch(idx: Bits, b: BitVector): BitVector =
+  final def patch(idx: BitCount, b: BitVector): BitVector =
     take(idx) ++ b ++ drop(idx + b.size)
 
   /**
@@ -169,14 +169,14 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    *
    * @group collection
    */
-  final def set(n: Bits): BitVector = update(n, true)
+  final def set(n: BitCount): BitVector = update(n, true)
 
   /**
    * Returns a new bit vector with the `n`th bit low (and all other bits unmodified).
    *
    * @group collection
    */
-  final def clear(n: Bits): BitVector = update(n, false)
+  final def clear(n: BitCount): BitVector = update(n, false)
 
   /**
    * Returns a new bit vector representing this vector's contents followed by the specified vector's contents.
@@ -215,7 +215,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    *
    * @group collection
    */
-  def drop(n: Bits): BitVector
+  def drop(n: BitCount): BitVector
 
   /**
    * Returns a vector of all bits in this vector except the last `n` bits.
@@ -224,7 +224,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    *
    * @group collection
    */
-  final def dropRight(n: Bits): BitVector =
+  final def dropRight(n: BitCount): BitVector =
     if (n.value <= 0) this
     else if (n >= size) BitVector.empty
     else take(size - n)
@@ -239,7 +239,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    * @see acquire
    * @group collection
    */
-  def take(n: Bits): BitVector
+  def take(n: BitCount): BitVector
 
   /**
    * Returns a vector of the last `n` bits of this vector.
@@ -248,7 +248,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    *
    * @group collection
    */
-  final def takeRight(n: Bits): BitVector =
+  final def takeRight(n: BitCount): BitVector =
     if (n < 0.bits) throw new IllegalArgumentException(s"takeRight($n)")
     else if (n >= size) this
     else this.drop(size - n)
@@ -258,7 +258,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    * Returns a pair of vectors that is equal to `(take(n), drop(n))`.
    * @group collection
    */
-  final def splitAt(n: Bits): (BitVector, BitVector) = (take(n), drop(n))
+  final def splitAt(n: BitCount): (BitVector, BitVector) = (take(n), drop(n))
 
   /**
    * Returns a vector made up of the bits starting at index `from` up to index `until`,
@@ -266,7 +266,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    *
    * @group collection
    */
-  final def slice(from: Bits, until: Bits): BitVector =
+  final def slice(from: BitCount, until: BitCount): BitVector =
     drop(from).take(until - from)
 
   /**
@@ -277,7 +277,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    * @see take
    * @group collection
    */
-  def acquire(n: Bits): Either[String, BitVector] =
+  def acquire(n: BitCount): Either[String, BitVector] =
     if (sizeGreaterThanOrEqual(n)) Right(take(n))
     else Left(s"cannot acquire $n from a vector that contains $size")
 
@@ -287,7 +287,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    * @see acquire
    * @group collection
    */
-  final def acquireThen[R](n: Bits)(err: String => R, f: BitVector => R): R =
+  final def acquireThen[R](n: BitCount)(err: String => R, f: BitVector => R): R =
     if (sizeGreaterThanOrEqual(n)) f(take(n))
     else err(s"cannot acquire $n from a vector that contains $size")
 
@@ -298,7 +298,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    *
    * @group collection
    */
-  final def consume[A](n: Bits)(decode: BitVector => Either[String, A]): Either[String, (BitVector, A)] =
+  final def consume[A](n: BitCount)(decode: BitVector => Either[String, A]): Either[String, (BitVector, A)] =
     for {
       toDecode <- acquire(n).right
       decoded <- decode(toDecode).right
@@ -313,7 +313,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    * @see acquireThen
    * @group collection
    */
-  final def consumeThen[R](n: Bits)(err: String => R, f: (BitVector,BitVector) => R): R =
+  final def consumeThen[R](n: BitCount)(err: String => R, f: (BitVector,BitVector) => R): R =
     if (sizeGreaterThanOrEqual(n)) f(take(n), drop(n)) // todo unsafeTake, unsafeDrop
     else err(s"cannot acquire $n from a vector that contains $size")
 
@@ -336,16 +336,16 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    * @return index of slice or -1 if not found
    * @group collection
    */
-  final def indexOfSlice(slice: BitVector): Bits = indexOfSlice(slice, 0.bit)
+  final def indexOfSlice(slice: BitVector): BitCount = indexOfSlice(slice, 0.bit)
 
   /**
    * Finds the first index after `from` of the specified bit pattern in this vector.
    * @return index of slice or -1 if not found
    * @group collection
    */
-  final def indexOfSlice(slice: BitVector, from: Bits): Bits = {
+  final def indexOfSlice(slice: BitVector, from: BitCount): BitCount = {
     @annotation.tailrec
-    def go(b: BitVector, idx: Bits): Bits = {
+    def go(b: BitVector, idx: BitCount): BitCount = {
       if (b startsWith slice) idx
       else if (b.isEmpty) (-1).bits
       else go(b.tail, idx + 1.bit)
@@ -363,7 +363,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    * Converts this vector in to a sequence of `n`-bit vectors.
    * @group collection
    */
-  final def grouped(n: Bits): Stream[BitVector] =
+  final def grouped(n: BitCount): Stream[BitVector] =
     if (isEmpty) Stream.empty
     else take(n) #:: drop(n).grouped(n)
 
@@ -409,7 +409,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    * @throws IllegalArgumentException if `n < size`
    * @group collection
    */
-  final def padTo(n: Bits): BitVector = padRight(n)
+  final def padTo(n: BitCount): BitVector = padRight(n)
 
   /**
    * Returns an `n`-bit vector whose contents are 0 or more low bits followed by this vector's contents.
@@ -417,7 +417,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    * @throws IllegalArgumentException if `n < size`
    * @group collection
    */
-  final def padRight(n: Bits): BitVector =
+  final def padRight(n: BitCount): BitVector =
     if (n < size) throw new IllegalArgumentException(s"BitVector.padRight($n)")
     else this ++ BitVector.fill(n - size)(false)
 
@@ -427,7 +427,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    * @throws IllegalArgumentException if `n < size`
    * @group collection
    */
-  final def padLeft(n: Bits): BitVector =
+  final def padLeft(n: BitCount): BitVector =
     if (n < size) throw new IllegalArgumentException(s"BitVector.padLeft($n)")
     else BitVector.fill(n - size)(false) ++ this
 
@@ -500,12 +500,12 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
   final def or(other: BitVector): BitVector = zipBytesWith(other)(_ | _)
   final def xor(other: BitVector): BitVector = zipBytesWith(other)(_ ^ _)
 
-  final def shiftLeft(n: Bits): BitVector =
+  final def shiftLeft(n: BitCount): BitVector =
     if (n.value <= 0) this
     else if (n >= size) BitVector.low(size)
     else drop(n) ++ BitVector.low(n)
 
-  final def shiftRight(n: Bits, signExtension: Boolean): BitVector = {
+  final def shiftRight(n: BitCount, signExtension: Boolean): BitVector = {
     if (isEmpty || n.value <= 0) this
     else {
       val extensionHigh = signExtension && head
@@ -517,7 +517,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
     }
   }
 
-  final def rotateLeft(n: Bits): BitVector =
+  final def rotateLeft(n: BitCount): BitVector =
     if (n.value <= 0) this
     else if (isEmpty) this
     else {
@@ -526,7 +526,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
       else drop(n0.bits) ++ take(n0.bits)
     }
 
-  final def rotateRight(n: Bits): BitVector =
+  final def rotateRight(n: BitCount): BitVector =
     if (n.value <= 0) this
     else if (isEmpty) this
     else {
@@ -750,13 +750,13 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    * @throws IllegalArgumentException if the slice refers to indices that are out of range
    * @group conversions
    */
-  final def sliceToByte(start: Bits, bits: Bits, signed: Boolean = true): Byte = {
+  final def sliceToByte(start: BitCount, bits: BitCount, signed: Boolean = true): Byte = {
     if (start.value % 8 != 0) drop(start).sliceToByte(0.bits, bits, signed)
     else if (isEmpty) 0.toByte
     else getByte(start, bits, signed)
   }
 
-  private def getByte(start: Bits, bits: Bits, signed: Boolean): Byte = {
+  private def getByte(start: BitCount, bits: BitCount, signed: Boolean): Byte = {
     require(sizeGreaterThanOrEqual(start + bits) && bits >= 0.bits && bits <= 8.bits)
     var result = 0x0ff & getByte(0)
     if (bits.value != 0) result = result >>> (8 - bits.value)
@@ -789,14 +789,14 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    * @throws IllegalArgumentException if the slice refers to indices that are out of range
    * @group conversions
    */
-  final def sliceToShort(start: Bits, bits: Bits,
+  final def sliceToShort(start: BitCount, bits: BitCount,
                        signed: Boolean = true, ordering: ByteOrdering = ByteOrdering.BigEndian): Short = {
     if (start.value % 8 != 0) drop(start).sliceToShort(0.bits, bits, signed, ordering)
     else if (ordering == ByteOrdering.LittleEndian) drop(start).invertReverseByteOrder.sliceToShort(0.bits, bits, signed, ByteOrdering.BigEndian)
     else getBigEndianShort(start, bits, signed)
   }
 
-  private def getBigEndianShort(start: Bits, bits: Bits, signed: Boolean = true): Short = {
+  private def getBigEndianShort(start: BitCount, bits: BitCount, signed: Boolean = true): Short = {
     require(sizeGreaterThanOrEqual(start + bits) && bits >= 0.bits && bits <= 16.bits)
     val mod = bits.value % 8
     var result = 0
@@ -840,14 +840,14 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    * @throws IllegalArgumentException if the slice refers to indices that are out of range
    * @group conversions
    */
-  final def sliceToInt(start: Bits, bits: Bits,
+  final def sliceToInt(start: BitCount, bits: BitCount,
                        signed: Boolean = true, ordering: ByteOrdering = ByteOrdering.BigEndian): Int = {
     if (start.value % 8 != 0) drop(start).sliceToInt(0.bits, bits, signed, ordering)
     else if (ordering == ByteOrdering.LittleEndian) drop(start).invertReverseByteOrder.sliceToInt(0.bits, bits, signed, ByteOrdering.BigEndian)
     else getBigEndianInt(start, bits, signed)
   }
 
-  private def getBigEndianInt(start: Bits, bits: Bits, signed: Boolean): Int = {
+  private def getBigEndianInt(start: BitCount, bits: BitCount, signed: Boolean): Int = {
     require(sizeGreaterThanOrEqual(start + bits) && bits >= 0.bits && bits <= 32.bits)
     val mod = bits.value % 8
     var result = 0
@@ -911,14 +911,14 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    * @throws IllegalArgumentException if the slice refers to indices that are out of range
    * @group conversions
    */
-  final def sliceToLong(start: Bits, bits: Bits,
+  final def sliceToLong(start: BitCount, bits: BitCount,
                         signed: Boolean = true, ordering: ByteOrdering = ByteOrdering.BigEndian): Long = {
     if (start.value % 8 != 0) drop(start).sliceToLong(0.bits, bits, signed, ordering)
     else if (ordering == ByteOrdering.LittleEndian) drop(start).invertReverseByteOrder.sliceToLong(0.bits, bits, signed, ByteOrdering.BigEndian)
     else getBigEndianLong(start, bits, signed)
   }
 
-  private def getBigEndianLong(start: Bits, bits: Bits, signed: Boolean): Long = {
+  private def getBigEndianLong(start: BitCount, bits: BitCount, signed: Boolean): Long = {
     require(sizeGreaterThanOrEqual(start + bits) && bits >= 0.bits && bits <= 64.bits)
     val mod = bits.value % 8
     var result = 0L
@@ -1137,10 +1137,10 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
 
   // impl details
 
-  final protected def checkBounds(n: Bits): Unit =
+  final protected def checkBounds(n: BitCount): Unit =
     if (!sizeGreaterThan(n)) outOfBounds(n)
 
-  final protected def outOfBounds(n: Bits): Nothing =
+  final protected def outOfBounds(n: BitCount): Nothing =
     throw new NoSuchElementException(s"invalid index: $n of $size")
 
   final protected def mapBytes(f: ByteVector => ByteVector): BitVector = this match {
@@ -1245,13 +1245,13 @@ object BitVector {
    * n-bit vector with all bits set high.
    * @group constructors
    */
-  def high(n: Bits): BitVector = fill(n)(true)
+  def high(n: BitCount): BitVector = fill(n)(true)
 
   /**
    * n-bit vector with all bits set low.
    * @group constructors
    */
-  def low(n: Bits): BitVector = fill(n)(false)
+  def low(n: BitCount): BitVector = fill(n)(false)
 
   /**
    * Constructs a `BitVector` from a `ByteVector`.
@@ -1303,7 +1303,7 @@ object BitVector {
    * not to modify the contents of the buffer passed to this function.
    * @group constructors
    */
-  def view(buffer: ByteBuffer, size: Bits): BitVector = {
+  def view(buffer: ByteBuffer, size: BitCount): BitVector = {
     toBytes(ByteVector.view(buffer), size)
   }
 
@@ -1321,13 +1321,13 @@ object BitVector {
    * not to modify the contents of the array passed to this function.
    * @group constructors
    */
-  def view(bs: Array[Byte], size: Bits): BitVector = toBytes(ByteVector.view(bs), size)
+  def view(bs: Array[Byte], size: BitCount): BitVector = toBytes(ByteVector.view(bs), size)
 
   /**
    * Constructs an `n`-bit `BitVector` where each bit is set to the specified value.
    * @group constructors
    */
-  def fill(n: Bits)(high: Boolean): BitVector = {
+  def fill(n: BitCount)(high: Boolean): BitVector = {
     val needed = n.toBytes.value
     val bs = ByteVector.fill(needed)(if (high) -1 else 0)
     toBytes(bs, n)
@@ -1339,7 +1339,7 @@ object BitVector {
    * @param size size of vector (<= 8)
    * @group numeric
    */
-  def fromByte(b: Byte, size: Bits = Bits(8)): BitVector = {
+  def fromByte(b: Byte, size: BitCount = BitCount(8)): BitVector = {
     require(size.value <= 8)
     (BitVector(b) << (8.bits - size)).take(size)
   }
@@ -1351,7 +1351,7 @@ object BitVector {
    * @param ordering byte ordering of vector
    * @group numeric
    */
-  def fromShort(s: Short, size: Bits = Bits(16), ordering: ByteOrdering = ByteOrdering.BigEndian): BitVector = {
+  def fromShort(s: Short, size: BitCount = BitCount(16), ordering: ByteOrdering = ByteOrdering.BigEndian): BitVector = {
     require(size.value <= 16)
     val buffer = ByteBuffer.allocate(2).order(ByteOrder.BIG_ENDIAN).putShort(s)
     buffer.flip()
@@ -1366,7 +1366,7 @@ object BitVector {
    * @param ordering byte ordering of vector
    * @group numeric
    */
-  def fromInt(i: Int, size: Bits = Bits(32), ordering: ByteOrdering = ByteOrdering.BigEndian): BitVector = {
+  def fromInt(i: Int, size: BitCount = BitCount(32), ordering: ByteOrdering = ByteOrdering.BigEndian): BitVector = {
     require(size.value <= 32)
     val buffer = ByteBuffer.allocate(4).order(ByteOrder.BIG_ENDIAN).putInt(i)
     buffer.flip()
@@ -1381,7 +1381,7 @@ object BitVector {
    * @param ordering byte ordering of vector
    * @group numeric
    */
-  def fromLong(l: Long, size: Bits = Bits(64), ordering: ByteOrdering = ByteOrdering.BigEndian): BitVector = {
+  def fromLong(l: Long, size: BitCount = BitCount(64), ordering: ByteOrdering = ByteOrdering.BigEndian): BitVector = {
     require(size.value <= 64)
     val buffer = ByteBuffer.allocate(8).order(ByteOrder.BIG_ENDIAN).putLong(l)
     buffer.flip()
@@ -1605,25 +1605,25 @@ object BitVector {
     }
 
   /** Smart constructor for `Bytes`. */
-  private[scodec] def toBytes(bs: ByteVector, size: Bits): Bytes = {
+  private[scodec] def toBytes(bs: ByteVector, size: BitCount): Bytes = {
     val needed = size.toBytes
     require(needed <= bs.size)
     val b = if (bs.size > needed.value) bs.take(needed.value) else bs
     Bytes(b, size)
   }
 
-  private[scodec] case class Bytes(val underlying: ByteVector, val size: Bits) extends BitVector {
+  private[scodec] case class Bytes(val underlying: ByteVector, val size: BitCount) extends BitVector {
     private def invalidBits = 8 - validBitsInLastByte(size).value.toInt
     def align = this
-    def sizeLessThan(n: Bits) = size < n
-    def take(n: Bits): Bytes = toBytes(underlying, 0.bits max (size min n))
-    def drop(n: Bits): BitVector = {
+    def sizeLessThan(n: BitCount) = size < n
+    def take(n: BitCount): Bytes = toBytes(underlying, 0.bits max (size min n))
+    def drop(n: BitCount): BitVector = {
       if (n >= size) BitVector.empty
       else if (n.value <= 0) this
       else if (n.value % 8 == 0) Bytes(underlying.drop(n.value / 8), size - n) // todo
       else Drop(this, n)
     }
-    def get(n: Bits): Boolean = {
+    def get(n: BitCount): Boolean = {
       checkBounds(n)
       getBit(underlying(n.value / 8), (n.value % 8).toInt)
     }
@@ -1636,7 +1636,7 @@ object BitVector {
       }
     }
 
-    def update(n: Bits, high: Boolean): BitVector = {
+    def update(n: BitCount, high: Boolean): BitVector = {
       checkBounds(n)
       val b2 = underlying.update(
         (n.value / 8), // todo
@@ -1666,12 +1666,12 @@ object BitVector {
     }
   }
 
-  private[scodec] case class Drop(underlying: Bytes, m: Bits) extends BitVector {
+  private[scodec] case class Drop(underlying: Bytes, m: BitCount) extends BitVector {
     def size = 0.bits max (underlying.size - m)
-    def sizeLessThan(n: Bits) = size < n
+    def sizeLessThan(n: BitCount) = size < n
     def align = interpretDrop
 
-    def drop(n: Bits): BitVector =
+    def drop(n: BitCount): BitVector =
       if (n >= size) BitVector.empty
       else if (n.value <= 0) this
       else { val nm = n + m
@@ -1679,16 +1679,16 @@ object BitVector {
              if (nm.value > 32768 && nm.value % 8 == 0) d.interpretDrop // occasionally
              else d
            }
-    def take(n: Bits): BitVector =
+    def take(n: BitCount): BitVector =
       if (n >= size) this
       else if (n.value <= 0) BitVector.empty
       else underlying.take(m + n).drop(m)
 
-    def get(n: Bits): Boolean =
+    def get(n: BitCount): Boolean =
       underlying.get(m + n)
     def getByte(n: Long): Byte =
       this.drop((n*8).bits).take(8.bits).align.getByte(0)
-    def update(n: Bits, high: Boolean): BitVector =
+    def update(n: BitCount, high: Boolean): BitVector =
       Drop(underlying.update(m + n, high).compact, m)
 
     def interpretDrop: Bytes = {
@@ -1717,14 +1717,14 @@ object BitVector {
   private[scodec] case class Append(left: BitVector,
                                     right: BitVector) extends BitVector {
 
-    def get(n: Bits): Boolean =
+    def get(n: BitCount): Boolean =
       if (n < left.size) left.get(n)
       else right.get(n - left.size)
     def getByte(n: Long): Byte =
       if (n < left.size.value / 8) left.getByte(n)
       else if (left.size.value % 8 == 0 && n > left.size.value / 8) right.getByte(n - left.size.value / 8)
       else drop((n*8).bits).take(8.bits).align.getByte(0) // fall back to inefficient impl (todo: improve this)
-    def update(n: Bits, high: Boolean): BitVector =
+    def update(n: BitCount, high: Boolean): BitVector =
       if (n < left.size) Append(left.update(n, high), right)
       else Append(left, right.update(n - left.size, high))
     def align = left.align combine right.align
@@ -1738,7 +1738,7 @@ object BitVector {
     }
     var sizeLowerBound = left.size.value
 
-    def size = Bits(
+    def size = BitCount(
       if (knownSize != -1L) knownSize
       else { // faster to just allow recomputation if there's contention
         val sz = left.size.value + right.size.value
@@ -1747,7 +1747,7 @@ object BitVector {
       }
     )
 
-    def take(n: Bits) = {
+    def take(n: BitCount) = {
       // NB: not worth early termination in event that sizeLessThanOrEqual(n) is true -
       // this case is rare, and requires traversing same BitVector twice, once to compute
       // sizeLessThan, then again to implement the `take`
@@ -1756,7 +1756,7 @@ object BitVector {
       else if (npos <= left.size) left.take(npos)
       else {
         @annotation.tailrec
-        def go(accL: BitVector, cur: BitVector, n: Bits): BitVector = cur match {
+        def go(accL: BitVector, cur: BitVector, n: BitCount): BitVector = cur match {
           case Append(left, right) => if (n <= left.size) accL ++ left.take(n)
                                       else go(accL ++ left, right, n - left.size)
           case s: Suspend => go(accL, s.underlying, n)
@@ -1766,12 +1766,12 @@ object BitVector {
       }
     }
 
-    def drop(n: Bits) = {
+    def drop(n: BitCount) = {
       val npos = 0.bits max n
       if (npos == 0.bits) this
       else {
         @annotation.tailrec
-        def go(cur: BitVector, n: Bits): BitVector = cur match {
+        def go(cur: BitVector, n: BitCount): BitVector = cur match {
           case Append(left, right) => if (n >= left.size) go(right, n - left.size)
                                       else Append(left.drop(n), right)
           case s: Suspend => go(s.underlying, n)
@@ -1782,7 +1782,7 @@ object BitVector {
       }
     }
 
-    def sizeLessThan(n: Bits) = {
+    def sizeLessThan(n: BitCount) = {
       if (knownSize != -1L) knownSize < n.value
       else if (sizeLowerBound >= n.value) false
       else {
@@ -1802,12 +1802,12 @@ object BitVector {
   }
   private[scodec] case class Suspend(thunk: () => BitVector) extends BitVector {
     lazy val underlying = thunk()
-    def sizeLessThan(n: Bits) = underlying.sizeLessThan(n)
-    def get(n: Bits): Boolean = underlying.get(n)
-    def take(n: Bits) = underlying.take(n)
-    def drop(n: Bits) = underlying.drop(n)
+    def sizeLessThan(n: BitCount) = underlying.sizeLessThan(n)
+    def get(n: BitCount): Boolean = underlying.get(n)
+    def take(n: BitCount) = underlying.take(n)
+    def drop(n: BitCount) = underlying.drop(n)
     def getByte(n: Long): Byte = underlying.getByte(n)
-    def update(n: Bits, high: Boolean): BitVector = underlying.update(n, high)
+    def update(n: BitCount, high: Boolean): BitVector = underlying.update(n, high)
     def size = underlying.size
     def align = underlying.align
   }
@@ -1822,8 +1822,8 @@ object BitVector {
     override def unchunk = Append(chunks.left, chunks.right.unchunk)
     def align = chunks.align
 
-    def take(n: Bits) = chunks.take(n)
-    def drop(n: Bits) = chunks.drop(n)
+    def take(n: BitCount) = chunks.take(n)
+    def drop(n: BitCount) = chunks.drop(n)
 
     override def ++(b: BitVector): BitVector =
       if (b.isEmpty) this
@@ -1849,12 +1849,12 @@ object BitVector {
       }
 
     def size = chunks.size
-    def sizeLessThan(n: Bits) = chunks.sizeLessThan(n)
+    def sizeLessThan(n: BitCount) = chunks.sizeLessThan(n)
 
-    def update(n: Bits, high: Boolean): BitVector =
+    def update(n: BitCount, high: Boolean): BitVector =
       chunks.update(n, high)
 
-    def get(n: Bits): Boolean = chunks.get(n)
+    def get(n: BitCount): Boolean = chunks.get(n)
     def getByte(n: Long): Byte = chunks.getByte(n)
   }
 
@@ -1873,7 +1873,7 @@ object BitVector {
     else (~(0x00000080 >> n)) & byte
   }.toByte
 
-  private def validBitsInLastByte(size: Bits): Bits = {
+  private def validBitsInLastByte(size: BitCount): BitCount = {
     val mod = size.value % 8
     (if (mod == 0) 8 else mod).bits
   }
@@ -1891,7 +1891,7 @@ object BitVector {
   }
 
   /** Clears (sets to 0) any bits in the last byte that are not used for storing `size` bits. */
-  private def clearUnneededBits(size: Bits, bytes: ByteVector): ByteVector = {
+  private def clearUnneededBits(size: BitCount, bytes: ByteVector): ByteVector = {
     val valid = validBitsInLastByte(size).value.toInt
     if (bytes.nonEmpty && valid < 8) {
       val idx = bytes.size - 1

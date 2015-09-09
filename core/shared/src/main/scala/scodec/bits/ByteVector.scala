@@ -496,16 +496,16 @@ sealed abstract class ByteVector extends BitwiseOperations[ByteVector] with Seri
   final def reverse: ByteVector =
     ByteVector.view(i => apply(size - i - 1), size)
 
-  final def shiftLeft(n: Bits): ByteVector =
+  final def shiftLeft(n: BitCount): ByteVector =
     BitVector(this).shiftLeft(n).toByteVector
 
-  final def shiftRight(n: Bits, signExtension: Boolean): ByteVector =
+  final def shiftRight(n: BitCount, signExtension: Boolean): ByteVector =
     BitVector(this).shiftRight(n, signExtension).toByteVector
 
-  final def rotateLeft(n: Bits): ByteVector =
+  final def rotateLeft(n: BitCount): ByteVector =
     BitVector(this).rotateLeft(n).toByteVector
 
-  final def rotateRight(n: Bits): ByteVector =
+  final def rotateRight(n: BitCount): ByteVector =
     BitVector(this).rotateRight(n).toByteVector
 
   /**
@@ -1386,7 +1386,7 @@ object ByteVector {
    * @param ordering byte ordering of vector
    * @group numeric
    */
-  def fromShort(s: Short, size: Bytes = Bytes(2), ordering: ByteOrdering = ByteOrdering.BigEndian): ByteVector =
+  def fromShort(s: Short, size: ByteCount = ByteCount(2), ordering: ByteOrdering = ByteOrdering.BigEndian): ByteVector =
     BitVector.fromShort(s, size.toBits, ordering).bytes
 
   /**
@@ -1396,7 +1396,7 @@ object ByteVector {
    * @param ordering byte ordering of vector
    * @group numeric
    */
-  def fromInt(i: Int, size: Bytes = Bytes(4), ordering: ByteOrdering = ByteOrdering.BigEndian): ByteVector =
+  def fromInt(i: Int, size: ByteCount = ByteCount(4), ordering: ByteOrdering = ByteOrdering.BigEndian): ByteVector =
     BitVector.fromInt(i, size.toBits, ordering).bytes
 
   /**
@@ -1406,7 +1406,7 @@ object ByteVector {
    * @param ordering byte ordering of vector
    * @group numeric
    */
-  def fromLong(l: Long, size: Bytes = Bytes(8), ordering: ByteOrdering = ByteOrdering.BigEndian): ByteVector =
+  def fromLong(l: Long, size: ByteCount = ByteCount(8), ordering: ByteOrdering = ByteOrdering.BigEndian): ByteVector =
     BitVector.fromLong(l, size.toBits, ordering).bytes
 
   /**

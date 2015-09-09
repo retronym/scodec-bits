@@ -39,15 +39,15 @@ package object bits {
   }
 
   final implicit class LongSyntax(val value: Long) extends AnyVal {
-    def bit: Bits = Bits(value)
-    def bits: Bits = Bits(value)
-    def byte: Bytes = Bytes(value)
-    def bytes: Bytes = Bytes(value)
+    def bit: BitCount = BitCount(value)
+    def bits: BitCount = BitCount(value)
+    def byte: ByteCount = ByteCount(value)
+    def bytes: ByteCount = ByteCount(value)
   }
   final implicit class IntSyntax(val value: Int) extends AnyVal {
-    def bit: Bits = Bits(value.toLong)
-    def bits: Bits = Bits(value.toLong)
-    def byte: Bytes = Bytes(value.toLong)
-    def bytes: Bytes = Bytes(value.toLong)
+    def bit: BitCount = BitCount(value.toLong)
+    def bits: BitCount = BitCount(value.toLong)
+    def byte: ByteCount = ByteCount(value.toLong)
+    def bytes: ByteCount = ByteCount(value.toLong)
   }
 }
