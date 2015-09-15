@@ -141,7 +141,7 @@ class ByteVectorTest extends BitsSuite {
       val unbuf = bs.foldLeft(b)(_ ++ _)
       val buf = bs.foldLeft(b.bufferBy((n % 50).max(0) + 1))(_ ++ _)
       unbuf shouldBe buf
-      val ind = (n % (unbuf.size+1)).max(0) + 1
+      val ind = ByteCount((n % (unbuf.size.value + 1)).max(0) + 1)
       buf.take(ind) shouldBe unbuf.take(ind)
       buf.drop(ind) shouldBe unbuf.drop(ind)
     }
@@ -245,11 +245,11 @@ class ByteVectorTest extends BitsSuite {
 
   test("indexOfSlice/containsSlice/startsWith") {
     forAll { (bv: ByteVector, m0: Int, n0: Int) =>
-      val m = if (bv.nonEmpty) (m0 % bv.size).abs else 0
-      val n = if (bv.nonEmpty) (n0 % bv.size).abs else 0
+      val m = ByteCount(if (bv.nonEmpty) (m0.toLong % bv.size.value).abs else 0)
+      val n = ByteCount(if (bv.nonEmpty) (n0.toLong % bv.size.value).abs else 0)
       val slice = bv.slice(m min n, m max n)
       val idx = bv.indexOfSlice(slice)
-      idx shouldBe bv.toIndexedSeq.indexOfSlice(slice.toIndexedSeq)
+      idx.value shouldBe bv.toIndexedSeq.indexOfSlice(slice.toIndexedSeq)
       bv.containsSlice(slice) shouldBe true
       if (bv.nonEmpty) bv.containsSlice(bv ++ bv) shouldBe false
     }
@@ -257,7 +257,7 @@ class ByteVectorTest extends BitsSuite {
 
   test("endsWith") {
     forAll { (bv: ByteVector, n0: Int) =>
-      val n = if (bv.nonEmpty) (n0 % bv.size).abs else 0
+      val n = if (bv.nonEmpty) ByteCount((n0.toLong % bv.size.value).abs) else ByteCount(0)
       val slice = bv.takeRight(n)
       bv.endsWith(slice) shouldBe true
       if (slice.nonEmpty) bv.endsWith(~slice) shouldBe false
@@ -266,7 +266,7 @@ class ByteVectorTest extends BitsSuite {
 
   test("splice") {
     forAll { (x: ByteVector, y: ByteVector, n0: Int) =>
-      val n = if (x.nonEmpty) (n0 % x.size).abs else 0
+      val n = if (x.nonEmpty) ByteCount((n0.toLong % x.size.value).abs) else ByteCount(0)
       x.splice(n, ByteVector.empty) shouldBe x
       x.splice(n, y) shouldBe (x.take(n) ++ y ++ x.drop(n))
     }
@@ -274,7 +274,7 @@ class ByteVectorTest extends BitsSuite {
 
   test("patch") {
     forAll { (x: ByteVector, y: ByteVector, n0: Int) =>
-      val n = if (x.nonEmpty) (n0 % x.size).abs else 0
+      val n = if (x.nonEmpty) ByteCount((n0.toLong % x.size.value).abs) else ByteCount(0)
       x.patch(n, x.slice(n, n)) shouldBe x
       x.patch(n, y) shouldBe (x.take(n) ++ y ++ x.drop(n + y.size))
     }
@@ -304,7 +304,7 @@ class ByteVectorTest extends BitsSuite {
   test("concat") {
     forAll { (bvs: List[ByteVector]) =>
       val c = ByteVector.concat(bvs)
-      c.size shouldBe bvs.map(_.size).foldLeft(0L)(_ + _)
+      c.size shouldBe bvs.map(_.size).foldLeft(ByteCount(0))(_ + _)
       bvs.headOption.foreach(h => c.startsWith(h))
       bvs.lastOption.foreach(l => c.endsWith(l))
     }

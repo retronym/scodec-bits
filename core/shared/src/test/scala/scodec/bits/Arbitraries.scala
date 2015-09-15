@@ -44,7 +44,7 @@ object Arbitraries {
     n <- Gen.choose(0L, maxSize)
     b <- genBitVector(15, 7)
   } yield {
-    val m = if (b.nonEmpty) (n % b.size.value).abs else 0
+    val m = ByteCount(if (b.nonEmpty) (n % b.size.value).abs else 0)
     b.take(m) ++ b.drop(m)
   }
 
@@ -67,7 +67,7 @@ object Arbitraries {
 
   def genSplitBytes(g: Gen[ByteVector]) = for {
     b <- g
-    n <- Gen.choose(0, b.size+1)
+    n <- Gen.choose(0, b.size.value + 1).map(ByteCount(_))
   } yield {
     b.take(n) ++ b.drop(n)
   }
@@ -94,8 +94,8 @@ object Arbitraries {
 
   val bytesWithIndex = for {
     b <- byteVectors
-    i <- Gen.choose(0L, b.size+1)
-  } yield (b, i)
+    i <- Gen.choose(0L, b.size.value + 1)
+  } yield (b, ByteCount(i))
 
   implicit val arbitraryByteVectors: Arbitrary[ByteVector] = Arbitrary(byteVectors)
 

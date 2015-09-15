@@ -115,7 +115,7 @@ sealed abstract class BitVector extends BitwiseOperations[BitVector] with Serial
    *
    * @group collection
    */
-  def getByte(n: Long): Byte
+  def getByte(n: ByteCount): Byte
 
   /**
    * Alias for `get`.
@@ -1258,7 +1258,7 @@ object BitVector {
    * This method has runtime O(1).
    * @group constructors
    */
-  def apply(bs: ByteVector): BitVector = toBytes(bs, bs.size.bytes.toBits)
+  def apply(bs: ByteVector): BitVector = toBytes(bs, bs.size.toBits)
 
   /**
    * Constructs a `BitVector` from a `ByteBuffer`. The given `ByteBuffer` is
@@ -1627,7 +1627,7 @@ object BitVector {
       checkBounds(n)
       getBit(underlying(n.value / 8), (n.value % 8).toInt)
     }
-    def getByte(n: Long): Byte = {
+    def getByte(n: ByteCount): Byte = {
       if (n < underlying.size-1)
         underlying(n)
       else { // last byte may have some garbage bits, clear these out
@@ -1686,8 +1686,8 @@ object BitVector {
 
     def get(n: BitCount): Boolean =
       underlying.get(m + n)
-    def getByte(n: Long): Byte =
-      this.drop((n*8).bits).take(8.bits).align.getByte(0)
+    def getByte(n: ByteCount): Byte =
+      this.drop(n.toBits.value).take(8.bits).align.getByte(0.byte)
     def update(n: BitCount, high: Boolean): BitVector =
       Drop(underlying.update(m + n, high).compact, m)
 
@@ -1720,10 +1720,10 @@ object BitVector {
     def get(n: BitCount): Boolean =
       if (n < left.size) left.get(n)
       else right.get(n - left.size)
-    def getByte(n: Long): Byte =
+    def getByte(n: ByteCount): Byte =
       if (n < left.size.value / 8) left.getByte(n)
       else if (left.size.value % 8 == 0 && n > left.size.value / 8) right.getByte(n - left.size.value / 8)
-      else drop((n*8).bits).take(8.bits).align.getByte(0) // fall back to inefficient impl (todo: improve this)
+      else drop(n.toBits).take(8.bits).align.getByte(0.byte) // fall back to inefficient impl (todo: improve this)
     def update(n: BitCount, high: Boolean): BitVector =
       if (n < left.size) Append(left.update(n, high), right)
       else Append(left, right.update(n - left.size, high))
@@ -1806,7 +1806,7 @@ object BitVector {
     def get(n: BitCount): Boolean = underlying.get(n)
     def take(n: BitCount) = underlying.take(n)
     def drop(n: BitCount) = underlying.drop(n)
-    def getByte(n: Long): Byte = underlying.getByte(n)
+    def getByte(n: ByteCount): Byte = underlying.getByte(n)
     def update(n: BitCount, high: Boolean): BitVector = underlying.update(n, high)
     def size = underlying.size
     def align = underlying.align
@@ -1855,7 +1855,7 @@ object BitVector {
       chunks.update(n, high)
 
     def get(n: BitCount): Boolean = chunks.get(n)
-    def getByte(n: Long): Byte = chunks.getByte(n)
+    def getByte(n: ByteCount): Byte = chunks.getByte(n)
   }
 
   /** Concatenate `vs` to produce a single `BitVector`. */
